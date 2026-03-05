@@ -17,9 +17,10 @@
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- Konfiguration für Tailwind Farben -->
+    <!-- Konfiguration für Tailwind Farben und Dark Mode -->
     <script>
         tailwind.config = {
+            darkMode: 'class', // Aktiviert Dark Mode über die Klasse 'dark'
             theme: {
                 extend: {
                     colors: {
@@ -27,7 +28,9 @@
                         dark: '#000000',
                         light: '#f5f5f5',
                         brandBlue: '#2C3E5A',
-                        greyText: '#333333'
+                        greyText: '#333333',
+                        darkBg: '#0a0a0a',
+                        darkCard: '#141414'
                     },
                     fontFamily: {
                         sans: ['"Noto Sans"', 'sans-serif'],
@@ -41,43 +44,164 @@
         body {
             font-family: 'Noto Sans', sans-serif;
             overflow-x: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
+        
         .bg-pattern {
             background-image: url('https://static.funnelcockpit.com/upload/JEs4ECXwpsn6og42C/13b5a61dd5a3d9f3750c72a4ffb0b49f.png');
             background-size: cover;
             background-repeat: no-repeat;
         }
+
+        /* Dark Mode Spezifische Anpassungen */
+        html.dark .bg-pattern {
+            background-blend-mode: multiply;
+            background-color: #050505; /* Verdunkelt das Pattern massiv im Dark Mode */
+        }
+
         .list-check-icon {
             width: 20px;
             color: #b19043;
             margin-right: 10px;
         }
+        
         .section-shadow {
             box-shadow: 0px 4px 40px 0px rgba(0,0,0,0.10);
         }
+
+        /* --- Super Edel Dark Mode Effekte --- */
+        .dark .text-gold-glow {
+            text-shadow: 0 0 10px rgba(177, 144, 67, 0.6), 0 0 20px rgba(177, 144, 67, 0.3);
+        }
+        
+        .dark .box-gold-glow {
+            box-shadow: 0 0 25px rgba(177, 144, 67, 0.2), inset 0 0 10px rgba(177, 144, 67, 0.05);
+            border: 1px solid rgba(177, 144, 67, 0.3);
+        }
+        
+        .dark .hover-box-gold-glow:hover {
+            box-shadow: 0 0 35px rgba(177, 144, 67, 0.4), inset 0 0 15px rgba(177, 144, 67, 0.1);
+            border-color: rgba(177, 144, 67, 0.6);
+            transform: translateY(-2px);
+            transition: all 0.3s ease;
+        }
+
+        /* Animierter goldener Gradient für Buttons und Highlights */
+        @keyframes gradient-x {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .dark .gold-gradient-anim {
+            background: linear-gradient(270deg, #111111, #3a2b0c, #111111, #241a05);
+            background-size: 300% 300%;
+            animation: gradient-x 6s ease infinite;
+            border: 1px solid rgba(177, 144, 67, 0.5);
+            box-shadow: 0 0 20px rgba(177, 144, 67, 0.4);
+        }
+        
+        .dark .gold-gradient-anim:hover {
+            box-shadow: 0 0 30px rgba(177, 144, 67, 0.7);
+            border-color: rgba(177, 144, 67, 0.8);
+        }
+
+        /* --- Animierte goldene Ambient-Background-Glows (Dark Mode) --- */
+        @keyframes float1 {
+            0% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(5vw, 5vh) scale(1.1); }
+            66% { transform: translate(-5vw, 10vh) scale(0.9); }
+            100% { transform: translate(0, 0) scale(1); }
+        }
+        @keyframes float2 {
+            0% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(-5vw, -10vh) scale(1.2); }
+            66% { transform: translate(10vw, -5vh) scale(0.8); }
+            100% { transform: translate(0, 0) scale(1); }
+        }
+        .dark-glow-blob-1 {
+            position: absolute;
+            top: -20vh;
+            left: -10vw;
+            width: 60vw;
+            height: 60vw;
+            background: radial-gradient(circle, rgba(177, 144, 67, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: float1 25s infinite ease-in-out;
+            filter: blur(50px);
+        }
+        .dark-glow-blob-2 {
+            position: absolute;
+            bottom: -20vh;
+            right: -10vw;
+            width: 70vw;
+            height: 70vw;
+            background: radial-gradient(circle, rgba(177, 144, 67, 0.12) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: float2 30s infinite ease-in-out reverse;
+            filter: blur(60px);
+        }
+
+        /* Verhindert Flackern beim Laden */
+        .no-transition * {
+        /* Verhindert Flackern beim Laden */
+        .no-transition * {
+            transition: none !important;
+        }
     </style>
+
+    <!-- Theme Initialisierung vor dem Rendern, um Flackern zu vermeiden -->
+    <script>
+        // Light Mode als Standard (ignoriert OS-Präferenz, es sei denn der Nutzer hat aktiv "dark" gewählt)
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+            localStorage.setItem('theme', 'light');
+        }
+    </script>
 </head>
-<body class="bg-white text-dark">
+<body class="bg-white text-dark dark:bg-darkBg dark:text-gray-100 no-transition relative" onload="document.body.classList.remove('no-transition')">
+
+    <!-- Dark Mode Animierte Goldene Background Glows -->
+    <div class="fixed inset-0 z-40 hidden dark:block overflow-hidden pointer-events-none mix-blend-screen opacity-80">
+        <div class="dark-glow-blob-1"></div>
+        <div class="dark-glow-blob-2"></div>
+    </div>
 
     <!-- Navigation -->
-    <nav class="bg-black py-4 px-4 md:px-8 text-white sticky top-0 z-50">
+    <nav class="bg-black dark:bg-[#050505] dark:border-b dark:border-gold/20 py-4 px-4 md:px-8 text-white sticky top-0 z-50 transition-colors duration-300">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <!-- Logo -->
             <a href="#">
                 <img src="logo_weiß.webp" alt="Florian Merzenich Logo" class="h-8 md:h-14">
             </a>
 
-            <!-- Desktop Menu -->
-            <div class="hidden md:flex space-x-6 text-sm font-medium">
+            <!-- Desktop Menu & Theme Toggle -->
+            <div class="hidden md:flex items-center space-x-6 text-sm font-medium">
                 <a href="#ueber-florian" class="hover:text-gold transition">Über Florian</a>
                 <a href="#der-prozess" class="hover:text-gold transition">Der Prozess</a>
                 <a href="#pressemitteilungen" class="hover:text-gold transition">Pressemitteilungen</a>
+                
+                <!-- Dark Mode Toggle Button Desktop -->
+                <button id="theme-toggle-desktop" class="text-gold hover:text-white transition ml-4 focus:outline-none p-2 rounded-full dark:bg-gray-800 bg-gray-900">
+                    <i class="fas fa-moon dark:hidden"></i>
+                    <i class="fas fa-sun hidden dark:inline"></i>
+                </button>
             </div>
 
-            <!-- Mobile Menu Button -->
-            <button id="mobile-menu-btn" class="md:hidden text-white focus:outline-none">
-                <i class="fas fa-bars text-2xl"></i>
-            </button>
+            <!-- Mobile Controls -->
+            <div class="md:hidden flex items-center space-x-4">
+                <!-- Dark Mode Toggle Button Mobile -->
+                <button id="theme-toggle-mobile" class="text-gold hover:text-white transition focus:outline-none p-2 rounded-full dark:bg-gray-800 bg-gray-900">
+                    <i class="fas fa-moon dark:hidden"></i>
+                    <i class="fas fa-sun hidden dark:inline"></i>
+                </button>
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-btn" class="text-white focus:outline-none">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+            </div>
         </div>
         <!-- Mobile Menu Dropdown -->
         <div id="mobile-menu" class="hidden md:hidden mt-4 space-y-2 pb-4 border-t border-gray-800 pt-4 px-4">
@@ -88,44 +212,44 @@
     </nav>
 
     <!-- Hero Section -->
-    <section class="bg-pattern py-12 md:py-16">
+    <section class="bg-pattern py-12 md:py-16 dark:bg-transparent">
         <div class="max-w-7xl mx-auto px-4 md:px-8">
             <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
                 
                 <!-- Left Content -->
                 <div class="md:col-span-7">
                     <h1 class="text-3xl md:text-5xl font-extrabold leading-tight mb-6">
-                        <span class="text-gold">Für Unternehmer & Investoren mit Kapital & ohne Plan.</span>
+                        <span class="text-gold dark:text-gold-glow">Für Unternehmer & Investoren mit Kapital & ohne Plan.</span>
                     </h1>
                     
-                    <p class="text-xl font-bold mb-4">Lerne, wie du Dein Geld strategisch investierst mit Klarheit, Strategie und Struktur.</p>
-                    <p class="text-lg mb-6">Du verdienst gut – aber dein Geld bleibt passiv? Ohne Strategie wächst dein Vermögen nicht. Lerne, wie du dein Kapital schützt, investierst – und unabhängig wirst von Banken, Trends & Hypes.</p>
+                    <p class="text-xl font-bold mb-4 dark:text-white">Lerne, wie du Dein Geld strategisch investierst mit Klarheit, Strategie und Struktur.</p>
+                    <p class="text-lg mb-6 dark:text-gray-300">Du verdienst gut – aber dein Geld bleibt passiv? Ohne Strategie wächst dein Vermögen nicht. Lerne, wie du dein Kapital schützt, investierst – und unabhängig wirst von Banken, Trends & Hypes.</p>
                     
-                    <ul class="space-y-4 text-lg font-medium mb-8">
+                    <ul class="space-y-4 text-lg font-medium mb-8 dark:text-gray-200">
                         <li class="flex items-start">
-                            <i class="fas fa-check list-check-icon mt-1"></i>
+                            <i class="fas fa-check list-check-icon mt-1 dark:text-gold-glow"></i>
                             <span><strong>5.000+</strong> begleitete Investoren seit 2013</span>
                         </li>
                         <li class="flex items-start">
-                            <i class="fas fa-check list-check-icon mt-1"></i>
+                            <i class="fas fa-check list-check-icon mt-1 dark:text-gold-glow"></i>
                             <span><strong>Ø +53 %</strong> Jahresrendite (2018–2024)*</span>
                         </li>
                         <li class="flex items-start">
-                            <i class="fas fa-check list-check-icon mt-1"></i>
+                            <i class="fas fa-check list-check-icon mt-1 dark:text-gold-glow"></i>
                             <span><strong>System statt Finanzprodukt:</strong> 100 % unabhängig</span>
                         </li>
                         <li class="flex items-start">
-                            <i class="fas fa-check list-check-icon mt-1"></i>
+                            <i class="fas fa-check list-check-icon mt-1 dark:text-gold-glow"></i>
                             <span><strong>Klarheit, Kontrolle & echte Strategie</strong></span>
                         </li>
                     </ul>
 
                     <div class="flex flex-col md:flex-row items-center gap-6">
-                        <a href="#mentoring" class="w-full md:w-auto bg-gold hover:bg-opacity-90 text-white font-bold text-lg py-4 px-8 rounded-full shadow-lg transition text-center">
+                        <a href="https://flos-funnel.pages.dev" target="_blank" class="w-full md:w-auto bg-gold hover:bg-opacity-90 text-white font-bold text-lg py-4 px-8 rounded-full shadow-lg transition text-center dark:gold-gradient-anim dark:text-white">
                             Jetzt Erstgespräch sichern
                         </a>
-                        <div class="flex flex-col items-center md:items-start text-sm font-bold">
-                            <div class="flex text-yellow-500 text-lg mb-1">
+                        <div class="flex flex-col items-center md:items-start text-sm font-bold dark:text-gray-300">
+                            <div class="flex text-yellow-500 dark:text-gold text-lg mb-1 dark:text-gold-glow">
                                 <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
                             </div>
                             <span>Über 5.000 Menschen vertrauen auf meine Expertise</span>
@@ -135,8 +259,8 @@
 
                 <!-- Right Content (Video) -->
                 <div class="md:col-span-5 mt-8 md:mt-0">
-                    <div class="bg-gold p-1 rounded-lg shadow-xl" style="background: linear-gradient(179deg,#B08F43 1.11%,rgba(176,143,67,0.90) 46.16%,rgba(176,143,67,0.00) 92.82%); padding-bottom: 2rem;">
-                        <div class="aspect-w-16 aspect-h-9 bg-black">
+                    <div class="bg-gold p-1 rounded-lg shadow-xl dark:box-gold-glow dark:bg-none" style="background: linear-gradient(179deg,#B08F43 1.11%,rgba(176,143,67,0.90) 46.16%,rgba(176,143,67,0.00) 92.82%); padding-bottom: 2rem;">
+                        <div class="aspect-w-16 aspect-h-9 bg-black rounded-sm overflow-hidden">
                             <iframe class="w-full h-64 md:h-80" src="https://www.youtube.com/embed/Ne07HGD4zHE" title="Video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                         </div>
                     </div>
@@ -146,22 +270,22 @@
     </section>
 
     <!-- Trust Section -->
-    <section class="py-10 bg-white">
+    <section class="py-10 bg-white dark:bg-darkBg transition-colors duration-300">
         <div class="max-w-6xl mx-auto px-4">
-            <div class="bg-white rounded-lg shadow-xl p-8 -mt-20 relative z-10 text-center">
-                <h3 class="text-2xl font-bold mb-6 text-brandBlue">Erfolg beim Investieren ist kein Zufall – sondern das Ergebnis eines klaren Systems</h3>
+            <div class="bg-white dark:bg-darkCard rounded-lg shadow-xl p-8 -mt-20 relative z-10 text-center dark:box-gold-glow transition-colors duration-300">
+                <h3 class="text-2xl font-bold mb-6 text-brandBlue dark:text-white">Erfolg beim Investieren ist kein Zufall – sondern das Ergebnis eines klaren Systems</h3>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
-                        <p class="text-4xl font-extrabold text-gold">11+</p>
-                        <p class="font-medium">Jahre Erfahrung im Krypto-Investment</p>
+                        <p class="text-4xl font-extrabold text-gold dark:text-gold-glow">11+</p>
+                        <p class="font-medium dark:text-gray-300">Jahre Erfahrung im Krypto-Investment</p>
                     </div>
                     <div>
-                        <p class="text-4xl font-extrabold text-gold">5.000+</p>
-                        <p class="font-medium">Menschen begleitet – seit 2013</p>
+                        <p class="text-4xl font-extrabold text-gold dark:text-gold-glow">5.000+</p>
+                        <p class="font-medium dark:text-gray-300">Menschen begleitet – seit 2013</p>
                     </div>
                     <div>
-                        <p class="text-4xl font-extrabold text-gold">53%</p>
-                        <p class="font-medium">Jahresrendite (2018–2024, ohne Garantie)</p>
+                        <p class="text-4xl font-extrabold text-gold dark:text-gold-glow">53%</p>
+                        <p class="font-medium dark:text-gray-300">Jahresrendite (2018–2024, ohne Garantie)</p>
                     </div>
                 </div>
             </div>
@@ -169,65 +293,65 @@
     </section>
 
     <!-- Problem Agitation Section -->
-    <section class="bg-light py-16 bg-pattern">
+    <section class="bg-light py-16 bg-pattern dark:bg-transparent">
         <div class="max-w-7xl mx-auto px-4 md:px-8">
-            <h2 class="text-3xl md:text-4xl font-extrabold text-center mb-16">
-                <span class="text-gold">Kapital auf dem Konto. Klarheit? Fehlanzeige.</span><br>Jeder Monat kostet dich Rendite, Klarheit und Kontrolle.
+            <h2 class="text-3xl md:text-4xl font-extrabold text-center mb-16 dark:text-white">
+                <span class="text-gold dark:text-gold-glow">Kapital auf dem Konto. Klarheit? Fehlanzeige.</span><br>Jeder Monat kostet dich Rendite, Klarheit und Kontrolle.
             </h2>
 
             <!-- Row 1 -->
             <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center mb-16">
                 <div class="md:col-span-9">
-                    <h3 class="text-2xl font-bold mb-4">Du verdienst gut – aber dein Geld liegt still.</h3>
-                    <p class="text-greyText text-lg">Du kennst die Theorie, aber nicht den Weg. Du willst investieren, aber vertraust niemandem. Du denkst in Jahrzehnten, aber wartest wie im Stillstand. Du hast Verantwortung, aber beim Kapital zögerst du.</p>
+                    <h3 class="text-2xl font-bold mb-4 dark:text-white">Du verdienst gut – aber dein Geld liegt still.</h3>
+                    <p class="text-greyText dark:text-gray-400 text-lg">Du kennst die Theorie, aber nicht den Weg. Du willst investieren, aber vertraust niemandem. Du denkst in Jahrzehnten, aber wartest wie im Stillstand. Du hast Verantwortung, aber beim Kapital zögerst du.</p>
                 </div>
                 <div class="md:col-span-3 text-center">
-                    <img src="https://static.funnelcockpit.com/upload/JEs4ECXwpsn6og42C/3ec0029f5af57fe34ac3b5db9b8a12df.png" alt="Stillstand" class="w-full max-w-xs mx-auto">
+                    <img src="https://static.funnelcockpit.com/upload/JEs4ECXwpsn6og42C/3ec0029f5af57fe34ac3b5db9b8a12df.png" alt="Stillstand" class="w-full max-w-xs mx-auto dark:opacity-80 dark:drop-shadow-[0_0_15px_rgba(177,144,67,0.3)]">
                 </div>
             </div>
 
             <!-- Row 2 -->
             <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center mb-16">
                  <div class="md:col-span-3 order-2 md:order-1 text-center">
-                    <img src="https://static.funnelcockpit.com/upload/JEs4ECXwpsn6og42C/f60e336005a2fe8e83322d1a3e77adeb.png" alt="Berater" class="w-full max-w-xs mx-auto">
+                    <img src="https://static.funnelcockpit.com/upload/JEs4ECXwpsn6og42C/f60e336005a2fe8e83322d1a3e77adeb.png" alt="Berater" class="w-full max-w-xs mx-auto dark:opacity-80 dark:drop-shadow-[0_0_15px_rgba(177,144,67,0.3)]">
                 </div>
                 <div class="md:col-span-9 order-1 md:order-2">
-                    <h3 class="text-2xl font-bold mb-4">Berater geben Tipps – aber keine Klarheit.</h3>
-                    <p class="text-greyText text-lg">Du bekommst Empfehlungen – aber keinen echten Plan. Standardlösungen und Abhängigkeit von Meinungen. Am Ende bist du genauso ratlos wie vorher. Du verlierst Zeit – aber gewinnst keine Klarheit.</p>
+                    <h3 class="text-2xl font-bold mb-4 dark:text-white">Berater geben Tipps – aber keine Klarheit.</h3>
+                    <p class="text-greyText dark:text-gray-400 text-lg">Du bekommst Empfehlungen – aber keinen echten Plan. Standardlösungen und Abhängigkeit von Meinungen. Am Ende bist du genauso ratlos wie vorher. Du verlierst Zeit – aber gewinnst keine Klarheit.</p>
                 </div>
             </div>
 
             <!-- Row 3 -->
             <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
                 <div class="md:col-span-9">
-                    <h3 class="text-2xl font-bold mb-4">Medien liefern Meinung – aber keine Struktur.</h3>
-                    <p class="text-greyText text-lg">Du bist umgeben von Hype, Trends und Buzzwords. Jeder erzählt etwas anderes. YouTube, Podcasts, TikTok – aber kein klares System. Also wartest du. Und verlierst jeden Tag an Kontrolle.</p>
+                    <h3 class="text-2xl font-bold mb-4 dark:text-white">Medien liefern Meinung – aber keine Struktur.</h3>
+                    <p class="text-greyText dark:text-gray-400 text-lg">Du bist umgeben von Hype, Trends und Buzzwords. Jeder erzählt etwas anderes. YouTube, Podcasts, TikTok – aber kein klares System. Also wartest du. Und verlierst jeden Tag an Kontrolle.</p>
                 </div>
                 <div class="md:col-span-3 text-center">
-                    <img src="https://static.funnelcockpit.com/upload/JEs4ECXwpsn6og42C/a0925e2f2bc3e53cc864268121cf6b04.png" alt="Medien & Hype" class="w-full max-w-xs mx-auto">
+                    <img src="https://static.funnelcockpit.com/upload/JEs4ECXwpsn6og42C/a0925e2f2bc3e53cc864268121cf6b04.png" alt="Medien & Hype" class="w-full max-w-xs mx-auto dark:opacity-80 dark:drop-shadow-[0_0_15px_rgba(177,144,67,0.3)]">
                 </div>
             </div>
 
              <!-- Summary Box -->
-             <div class="bg-gray-200 rounded-lg p-8 mt-12 text-center text-xl font-medium mx-4 md:mx-16">
-                <strong>Was dich heute bremst und was dich jeden Monat kostet:</strong><br>
-                Das Investoren-Paradoxon. Je mehr Verantwortung du trägst, desto schwerer fällt Vertrauen. Kapital liegt – statt zu arbeiten. Und jeden Monat verliert es an realem Wert.
+             <div class="bg-gray-200 dark:bg-darkCard rounded-lg p-8 mt-12 text-center text-xl font-medium mx-4 md:mx-16 dark:border dark:border-gold/30 dark:shadow-[0_0_20px_rgba(177,144,67,0.1)]">
+                <strong class="dark:text-gold dark:text-gold-glow">Was dich heute bremst und was dich jeden Monat kostet:</strong><br>
+                <span class="dark:text-gray-300">Das Investoren-Paradoxon. Je mehr Verantwortung du trägst, desto schwerer fällt Vertrauen. Kapital liegt – statt zu arbeiten. Und jeden Monat verliert es an realem Wert.</span>
             </div>
         </div>
     </section>
 
     <!-- Dark Comparison Section -->
-    <section class="bg-brandBlue text-white py-16" style="background-image: url('https://static.funnelcockpit.com/upload/JEs4ECXwpsn6og42C/266ed3c892f7c671d53885f58e8f020d.png'); background-size: cover;">
+    <section class="bg-brandBlue dark:bg-[#080808] text-white py-16 transition-colors duration-300" style="background-image: url('https://static.funnelcockpit.com/upload/JEs4ECXwpsn6og42C/266ed3c892f7c671d53885f58e8f020d.png'); background-size: cover; background-blend-mode: overlay; background-color: rgba(10,10,10,0.6);">
         <div class="max-w-7xl mx-auto px-4 md:px-8 text-center">
             <h2 class="text-3xl md:text-4xl font-extrabold mb-12">
-                Finanzberatung von gestern vs. <span class="text-gold">Kapitalstrategie von morgen.</span>
+                Finanzberatung von gestern vs. <span class="text-gold dark:text-gold-glow">Kapitalstrategie von morgen.</span>
             </h2>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
                 <!-- Card 1 (Typischer Berater) -->
-                <div class="bg-white text-black rounded-lg p-8 section-shadow border-t-8 border-gray-400">
-                    <h3 class="text-2xl font-bold mb-4 text-center">Typischer Finanzberater</h3>
-                    <p class="text-left mb-4 italic">Viele Finanzdienstleister arbeiten mit Produkten, Mustervorlagen oder standardisierten Strategien. Was du dort bekommst, ist meist schnell – aber selten tief.</p>
+                <div class="bg-white dark:bg-[#111] text-black dark:text-gray-300 rounded-lg p-8 section-shadow border-t-8 border-gray-400 dark:border-gray-600 transition-colors duration-300">
+                    <h3 class="text-2xl font-bold mb-4 text-center dark:text-gray-100">Typischer Finanzberater</h3>
+                    <p class="text-left mb-4 italic dark:text-gray-400">Viele Finanzdienstleister arbeiten mit Produkten, Mustervorlagen oder standardisierten Strategien. Was du dort bekommst, ist meist schnell – aber selten tief.</p>
                     <ul class="text-left space-y-3 font-medium">
                         <li><i class="fas fa-times text-red-500 mr-2"></i> Produktorientiert, provisionsträchtig</li>
                         <li><i class="fas fa-times text-red-500 mr-2"></i> Standardisiert, wenig flexibel</li>
@@ -238,15 +362,16 @@
                 </div>
 
                  <!-- Card 2 (Florian Merzenich) -->
-                 <div class="bg-white text-black rounded-lg p-8 section-shadow border-t-8 border-gold transform md:-translate-y-4 shadow-2xl">
-                    <h3 class="text-2xl font-bold mb-4 text-center text-gold">Florian Merzenich Mentoring</h3>
-                    <p class="text-left mb-4 font-bold">Lerne, wie du dein Kapital selbstständig und strategisch steuerst. Mit Systemverständnis, Klarheit und einem Plan, der zu deiner Realität passt.</p>
-                    <ul class="text-left space-y-3 font-medium">
-                        <li><i class="fas fa-check text-green-500 mr-2"></i> Bildungsbasiert, unabhängig</li>
-                        <li><i class="fas fa-check text-green-500 mr-2"></i> Persönlich, auf Lebenswirklichkeit abgestimmt</li>
-                        <li><i class="fas fa-check text-green-500 mr-2"></i> Tiefgreifend, mit Systemverständnis</li>
-                        <li><i class="fas fa-check text-green-500 mr-2"></i> Selbstbestimmung, Klarheit, Investoren-Kompetenz</li>
-                        <li><i class="fas fa-check text-green-500 mr-2"></i> Persönliche Begleitung durch Florian selbst</li>
+                 <div class="bg-white dark:bg-[#0a0a0a] text-black dark:text-gray-200 rounded-lg p-8 section-shadow border-t-8 border-gold transform md:-translate-y-4 shadow-2xl dark:box-gold-glow transition-colors duration-300 relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-br from-gold/5 to-transparent pointer-events-none hidden dark:block"></div>
+                    <h3 class="text-2xl font-bold mb-4 text-center text-gold dark:text-gold-glow relative z-10">Florian Merzenich Mentoring</h3>
+                    <p class="text-left mb-4 font-bold dark:text-white relative z-10">Lerne, wie du dein Kapital selbstständig und strategisch steuerst. Mit Systemverständnis, Klarheit und einem Plan, der zu deiner Realität passt.</p>
+                    <ul class="text-left space-y-3 font-medium relative z-10">
+                        <li><i class="fas fa-check text-green-500 mr-2 dark:text-gold"></i> Bildungsbasiert, unabhängig</li>
+                        <li><i class="fas fa-check text-green-500 mr-2 dark:text-gold"></i> Persönlich, auf Lebenswirklichkeit abgestimmt</li>
+                        <li><i class="fas fa-check text-green-500 mr-2 dark:text-gold"></i> Tiefgreifend, mit Systemverständnis</li>
+                        <li><i class="fas fa-check text-green-500 mr-2 dark:text-gold"></i> Selbstbestimmung, Klarheit, Investoren-Kompetenz</li>
+                        <li><i class="fas fa-check text-green-500 mr-2 dark:text-gold"></i> Persönliche Begleitung durch Florian selbst</li>
                     </ul>
                 </div>
             </div>
@@ -254,203 +379,204 @@
     </section>
 
     <!-- The 3 Phases Section (Der Prozess) -->
-    <section id="der-prozess" class="bg-white py-16 bg-pattern">
+    <section id="der-prozess" class="bg-white py-16 bg-pattern dark:bg-transparent">
         <div class="max-w-7xl mx-auto px-4 md:px-8">
-            <h2 class="text-3xl md:text-4xl font-extrabold text-center mb-6">
-                Zeit für eine Lösung, die dir <span class="text-gold">Kontrolle zurückgibt.</span>
+            <h2 class="text-3xl md:text-4xl font-extrabold text-center mb-6 dark:text-white">
+                Zeit für eine Lösung, die dir <span class="text-gold dark:text-gold-glow">Kontrolle zurückgibt.</span>
             </h2>
-            <p class="text-center text-lg max-w-3xl mx-auto mb-16">
+            <p class="text-center text-lg max-w-3xl mx-auto mb-16 dark:text-gray-300">
                 Unser Mentoring basiert auf einem strukturierten System, das Klarheit in deine Geldentscheidungen bringt – mit dem Ziel, dass du unabhängig, selbstbewusst und strategisch investieren kannst.
             </p>
 
             <!-- Phase 1 -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-20">
                 <div>
-                    <h3 class="text-gold text-2xl md:text-3xl font-bold mb-2">Tiefe durch echtes Finanzverständnis.</h3>
-                    <h4 class="text-xl font-bold mb-4">Struktur statt Unsicherheit: Finanzielle Klarheit</h4>
-                    <p class="mb-4 text-lg">Es geht nicht darum, was „man gerade macht“. Sondern darum zu verstehen, wie Geldsysteme funktionieren – und wie sie gezielt genutzt werden können.</p>
-                    <p class="text-lg font-bold">Für Menschen, die mitdenken. Und vorbauen wollen.</p>
+                    <h3 class="text-gold text-2xl md:text-3xl font-bold mb-2 dark:text-gold-glow">Tiefe durch echtes Finanzverständnis.</h3>
+                    <h4 class="text-xl font-bold mb-4 dark:text-white">Struktur statt Unsicherheit: Finanzielle Klarheit</h4>
+                    <p class="mb-4 text-lg dark:text-gray-400">Es geht nicht darum, was „man gerade macht“. Sondern darum zu verstehen, wie Geldsysteme funktionieren – und wie sie gezielt genutzt werden können.</p>
+                    <p class="text-lg font-bold dark:text-gray-200">Für Menschen, die mitdenken. Und vorbauen wollen.</p>
                 </div>
-                <div class="p-4 bg-light rounded-lg">
-                    <img src="pic1.webp" alt="Finanzielle Klarheit" class="rounded w-full">
+                <div class="p-4 bg-light dark:bg-darkCard rounded-lg dark:box-gold-glow">
+                    <img src="pic1.webp" alt="Finanzielle Klarheit" class="rounded w-full dark:opacity-90">
                 </div>
             </div>
 
             <!-- Phase 2 -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-20">
-                <div class="order-2 md:order-1 p-4 bg-light rounded-lg">
-                    <img src="xlg.webp" alt="Strategisches Denken" class="rounded w-full">
+                <div class="order-2 md:order-1 p-4 bg-light dark:bg-darkCard rounded-lg dark:box-gold-glow">
+                    <img src="xlg.webp" alt="Strategisches Denken" class="rounded w-full dark:opacity-90">
                 </div>
                 <div class="order-1 md:order-2">
-                    <h3 class="text-gold text-2xl md:text-3xl font-bold mb-2">Souveränität durch bewährte Strategien.</h3>
-                    <h4 class="text-xl font-bold mb-4">Investieren mit System: Strategisches Denken</h4>
-                    <p class="mb-4 text-lg">Die Strategie basiert nicht auf aktuellen Trends oder dem, was gerade laut ist – sondern auf Prinzipien, die erprobt sind. Ob Bitcoin, Gold oder Beteiligungen: Jede Entscheidung folgt einer klaren Logik, abgestimmt auf deine Ziele und deinen Horizont.</p>
-                    <p class="text-lg font-bold">Investieren wird damit planbar. Und kalkulierbar.</p>
+                    <h3 class="text-gold text-2xl md:text-3xl font-bold mb-2 dark:text-gold-glow">Souveränität durch bewährte Strategien.</h3>
+                    <h4 class="text-xl font-bold mb-4 dark:text-white">Investieren mit System: Strategisches Denken</h4>
+                    <p class="mb-4 text-lg dark:text-gray-400">Die Strategie basiert nicht auf aktuellen Trends oder dem, was gerade laut ist – sondern auf Prinzipien, die erprobt sind. Ob Bitcoin, Gold oder Beteiligungen: Jede Entscheidung folgt einer klaren Logik, abgestimmt auf deine Ziele und deinen Horizont.</p>
+                    <p class="text-lg font-bold dark:text-gray-200">Investieren wird damit planbar. Und kalkulierbar.</p>
                 </div>
             </div>
 
             <!-- Phase 3 -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
                 <div>
-                    <h3 class="text-gold text-2xl md:text-3xl font-bold mb-2">Selbstständigkeit durch eine klare Denkweise.</h3>
-                    <h4 class="text-xl font-bold mb-4">Begleitung auf Augenhöhe: Unabhängige Umsetzung</h4>
-                    <p class="mb-4 text-lg">Das Mentoring schafft Sicherheit und Selbstständigkeit zugleich. Es geht nicht darum, dauerhaft betreut zu werden – sondern darum, die richtigen Entscheidungen selbst treffen zu können.</p>
-                    <p class="text-lg font-bold">Mit Überblick. Mit Klarheit. Und mit der Haltung eines Investors.</p>
+                    <h3 class="text-gold text-2xl md:text-3xl font-bold mb-2 dark:text-gold-glow">Selbstständigkeit durch eine klare Denkweise.</h3>
+                    <h4 class="text-xl font-bold mb-4 dark:text-white">Begleitung auf Augenhöhe: Unabhängige Umsetzung</h4>
+                    <p class="mb-4 text-lg dark:text-gray-400">Das Mentoring schafft Sicherheit und Selbstständigkeit zugleich. Es geht nicht darum, dauerhaft betreut zu werden – sondern darum, die richtigen Entscheidungen selbst treffen zu können.</p>
+                    <p class="text-lg font-bold dark:text-gray-200">Mit Überblick. Mit Klarheit. Und mit der Haltung eines Investors.</p>
                 </div>
-                <div class="p-4 bg-light rounded-lg">
-                    <img src="mitfrau.webp" alt="Unabhängige Umsetzung" class="rounded w-full">
+                <div class="p-4 bg-light dark:bg-darkCard rounded-lg dark:box-gold-glow">
+                    <img src="mitfrau.webp" alt="Unabhängige Umsetzung" class="rounded w-full dark:opacity-90">
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Testimonials Section -->
-    <section class="bg-gray-50 py-16 border-t border-b">
+    <section class="bg-gray-50 py-16 border-t border-b dark:bg-[#0a0a0a] dark:border-gold/20 transition-colors duration-300">
         <div class="max-w-4xl mx-auto px-4 text-center">
-            <h2 class="text-3xl font-bold mb-8">Das sagen Kunden über mich:</h2>
-            <div class="bg-white p-8 rounded-lg shadow-lg flex flex-col md:flex-row items-center gap-8 border border-gray-100">
-                <div class="md:w-1/3 text-center md:border-r border-gray-200 md:pr-8">
-                    <div class="text-gold text-2xl mb-2">
+            <h2 class="text-3xl font-bold mb-8 dark:text-white">Das sagen Kunden über mich:</h2>
+            <div class="bg-white dark:bg-darkCard p-8 rounded-lg shadow-lg flex flex-col md:flex-row items-center gap-8 border border-gray-100 dark:border-gold/30 dark:shadow-[0_0_20px_rgba(177,144,67,0.1)]">
+                <div class="md:w-1/3 text-center md:border-r border-gray-200 dark:border-gray-700 md:pr-8">
+                    <div class="text-gold text-2xl mb-2 dark:text-gold-glow">
                         <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
                     </div>
-                    <p class="text-3xl font-bold">4,98 <span class="text-lg text-gray-500 font-normal">/ 5,00</span></p>
-                    <p class="font-bold text-gray-700 mt-2">Sehr Gut</p>
-                    <p class="text-sm text-gray-500">50 Bewertungen auf ProvenExpert</p>
-                    <p class="text-sm text-gray-500 mt-2">100% Empfehlungen</p>
+                    <p class="text-3xl font-bold dark:text-white">4,98 <span class="text-lg text-gray-500 dark:text-gray-400 font-normal">/ 5,00</span></p>
+                    <p class="font-bold text-gray-700 dark:text-gold mt-2">Sehr Gut</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">50 Bewertungen auf ProvenExpert</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">100% Empfehlungen</p>
                 </div>
                 <div class="md:w-2/3 text-left">
-                    <p class="italic text-lg text-gray-700 mb-4">"Florian Danke!!! Der letzte Zoom Call war einfach Mega wirklich! Ich habe so viel dazu gelernt und mit meine..."</p>
-                    <p class="font-bold">- Waltraut J. <span class="text-xs text-gray-400 font-normal ml-2">Authentizität geprüft</span></p>
+                    <p class="italic text-lg text-gray-700 dark:text-gray-300 mb-4">"Florian Danke!!! Der letzte Zoom Call war einfach Mega wirklich! Ich habe so viel dazu gelernt und mit meine..."</p>
+                    <p class="font-bold dark:text-white">- Waltraut J. <span class="text-xs text-gray-400 dark:text-gray-500 font-normal ml-2">Authentizität geprüft</span></p>
                 </div>
             </div>
-            <p class="mt-6 font-medium text-gray-600">5.000+ betreute Anleger · 50 verifizierte ⭐⭐⭐⭐⭐-Bewertungen</p>
+            <p class="mt-6 font-medium text-gray-600 dark:text-gray-400">5.000+ betreute Anleger · 50 verifizierte ⭐⭐⭐⭐⭐-Bewertungen</p>
         </div>
     </section>
 
     <!-- About Florian Section -->
-    <section id="ueber-florian" class="py-16 bg-white">
+    <section id="ueber-florian" class="py-16 bg-white dark:bg-darkBg transition-colors duration-300">
         <div class="max-w-7xl mx-auto px-4 md:px-8">
-            <h2 class="text-3xl md:text-4xl font-extrabold text-center mb-16">
-                Ich bin <span class="text-gold">Florian Merzenich</span>
+            <h2 class="text-3xl md:text-4xl font-extrabold text-center mb-16 dark:text-white">
+                Ich bin <span class="text-gold dark:text-gold-glow">Florian Merzenich</span>
             </h2>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
                 <div>
-                    <h3 class="text-2xl font-bold mb-6">Experte für Investitionen & Crypto</h3>
-                    <p class="text-lg mb-4">Ich helfe Unternehmern und Privatanlegern, ihr Vermögen mit klarer Strategie und ohne Spekulation planbar zu steigern.</p>
+                    <h3 class="text-2xl font-bold mb-6 dark:text-white">Experte für Investitionen & Crypto</h3>
+                    <p class="text-lg mb-4 dark:text-gray-300">Ich helfe Unternehmern und Privatanlegern, ihr Vermögen mit klarer Strategie und ohne Spekulation planbar zu steigern.</p>
                     
-                    <ul class="space-y-4 mb-8">
+                    <ul class="space-y-4 mb-8 dark:text-gray-300">
                         <li class="flex items-start">
-                            <i class="fas fa-check text-gold mt-1 mr-3"></i>
-                            <span><strong>5.000+ Anleger persönlich begleitet</strong> – individuelle 1-zu-1-Mentorings & Live-Calls.</span>
+                            <i class="fas fa-check text-gold mt-1 mr-3 dark:text-gold-glow"></i>
+                            <span><strong class="dark:text-white">5.000+ Anleger persönlich begleitet</strong> – individuelle 1-zu-1-Mentorings & Live-Calls.</span>
                         </li>
                         <li class="flex items-start">
-                            <i class="fas fa-check text-gold mt-1 mr-3"></i>
-                            <span><strong>Mitgründer von Usecape</strong> & Marktführer in der Crypto-Investor-Ausbildung.</span>
+                            <i class="fas fa-check text-gold mt-1 mr-3 dark:text-gold-glow"></i>
+                            <span><strong class="dark:text-white">Mitgründer von Usecape</strong> & Marktführer in der Crypto-Investor-Ausbildung.</span>
                         </li>
                         <li class="flex items-start">
-                            <i class="fas fa-check text-gold mt-1 mr-3"></i>
-                            <span><strong>Ø 53 % Jahresrendite (2018 – 2024)</strong> – bewährtes Portfolio-System, 100 % transparent.</span>
+                            <i class="fas fa-check text-gold mt-1 mr-3 dark:text-gold-glow"></i>
+                            <span><strong class="dark:text-white">Ø 53 % Jahresrendite (2018 – 2024)</strong> – bewährtes Portfolio-System, 100 % transparent.</span>
                         </li>
                         <li class="flex items-start">
-                            <i class="fas fa-check text-gold mt-1 mr-3"></i>
-                            <span><strong>120.000 € in Persönlichkeitsentwicklung</strong> investiert in über 300 Coaching-Stunden für messbare Ergebnisse.</span>
+                            <i class="fas fa-check text-gold mt-1 mr-3 dark:text-gold-glow"></i>
+                            <span><strong class="dark:text-white">120.000 € in Persönlichkeitsentwicklung</strong> investiert in über 300 Coaching-Stunden für messbare Ergebnisse.</span>
                         </li>
                     </ul>
                 </div>
-                <div>
-                    <img src="sporian.webp" alt="Florian Merzenich" class="rounded-lg shadow-xl w-full max-w-md mx-auto">
+                <div class="relative">
+                    <div class="absolute inset-0 rounded-lg dark:box-gold-glow hidden dark:block scale-105"></div>
+                    <img src="hero_bg.webp" alt="Florian Merzenich" class="rounded-lg shadow-xl w-full max-w-md mx-auto relative z-10">
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Team Section -->
-    <section class="bg-light py-16 bg-pattern">
+    <section class="bg-light py-16 bg-pattern dark:bg-transparent">
         <div class="max-w-7xl mx-auto px-4 md:px-8">
-            <h2 class="text-3xl md:text-4xl font-extrabold text-center mb-4">
-                Lerne mein <span class="text-gold">virtuelles Team</span> kennen
+            <h2 class="text-3xl md:text-4xl font-extrabold text-center mb-4 dark:text-white">
+                Lerne mein <span class="text-gold dark:text-gold-glow">virtuelles Team</span> kennen
             </h2>
-            <p class="text-center text-lg mb-12 max-w-3xl mx-auto">Experten, die dich mit Struktur, Fachwissen und persönlichem Einsatz begleiten.</p>
+            <p class="text-center text-lg mb-12 max-w-3xl mx-auto dark:text-gray-300">Experten, die dich mit Struktur, Fachwissen und persönlichem Einsatz begleiten.</p>
             
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 <!-- Team Member 1 -->
-                <div class="bg-white rounded shadow-sm overflow-hidden flex flex-col h-full">
-                    <img src="florian.webp" alt="Florian Merzenich" class="w-full h-48 object-cover object-top">
+                <div class="bg-white dark:bg-darkCard dark:border dark:border-gold/20 rounded shadow-sm overflow-hidden flex flex-col h-full hover-box-gold-glow transition-all duration-300">
+                    <img src="florian.webp" alt="Florian Merzenich" class="w-full h-48 object-cover object-top dark:opacity-90">
                     <div class="p-4 flex-grow flex flex-col">
-                        <p class="text-gold font-bold text-xl leading-tight">Florian<br>Merzenich</p>
-                        <p class="text-sm font-bold text-gray-600 mt-1 mb-3">Founder · Geschäftsführer · CEO</p>
-                        <p class="text-xs text-gray-500 leading-relaxed">Gründer der Blockchain-Akademie. Steht für klare Finanzbildung, Verantwortung und echte Begleitung auf Augenhöhe. Vermittelt komplexe Finanz- und Krypto-Themen verständlich und praxisnah.</p>
+                        <p class="text-gold font-bold text-xl leading-tight dark:text-gold-glow">Florian<br>Merzenich</p>
+                        <p class="text-sm font-bold text-gray-600 dark:text-gray-400 mt-1 mb-3">Founder · Geschäftsführer · CEO</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">Gründer der Blockchain-Akademie. Steht für klare Finanzbildung, Verantwortung und echte Begleitung auf Augenhöhe. Vermittelt komplexe Finanz- und Krypto-Themen verständlich und praxisnah.</p>
                     </div>
                 </div>
 
                 <!-- Team Member 2 -->
-                <div class="bg-white rounded shadow-sm overflow-hidden flex flex-col h-full">
-                    <img src="markus.webp" alt="Markus Hoffmann" class="w-full h-48 object-cover object-top">
+                <div class="bg-white dark:bg-darkCard dark:border dark:border-gold/20 rounded shadow-sm overflow-hidden flex flex-col h-full hover-box-gold-glow transition-all duration-300">
+                    <img src="markus.webp" alt="Markus Hoffmann" class="w-full h-48 object-cover object-top dark:opacity-90">
                     <div class="p-4 flex-grow flex flex-col">
-                        <p class="text-gold font-bold text-xl leading-tight">Markus<br>Hoffmann</p>
-                        <p class="text-sm font-bold text-gray-600 mt-1 mb-3">Blockchain-Trainer · CCFE-zertifiziert</p>
-                        <p class="text-xs text-gray-500 leading-relaxed">Betreut Ultimate Mastermind Platinum Kunden persönlich im Krypto-Markt. Führt High-Value-Calls und verbindet Fachwissen mit strategischem Denken.</p>
+                        <p class="text-gold font-bold text-xl leading-tight dark:text-gold-glow">Markus<br>Hoffmann</p>
+                        <p class="text-sm font-bold text-gray-600 dark:text-gray-400 mt-1 mb-3">Blockchain-Trainer · CCFE-zertifiziert</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">Betreut Ultimate Mastermind Platinum Kunden persönlich im Krypto-Markt. Führt High-Value-Calls und verbindet Fachwissen mit strategischem Denken.</p>
                     </div>
                 </div>
 
                 <!-- Team Member 3 -->
-                <div class="bg-white rounded shadow-sm overflow-hidden flex flex-col h-full">
-                    <img src="maxi.webp" alt="Maximilian Steger" class="w-full h-48 object-cover object-top">
+                <div class="bg-white dark:bg-darkCard dark:border dark:border-gold/20 rounded shadow-sm overflow-hidden flex flex-col h-full hover-box-gold-glow transition-all duration-300">
+                    <img src="maxi.webp" alt="Maximilian Steger" class="w-full h-48 object-cover object-top dark:opacity-90">
                     <div class="p-4 flex-grow flex flex-col">
-                        <p class="text-gold font-bold text-xl leading-tight">Maximilian<br>Steger</p>
-                        <p class="text-sm font-bold text-gray-600 mt-1 mb-3">Blockchain-Trainer</p>
-                        <p class="text-xs text-gray-500 leading-relaxed">Begleitet Teilnehmer ruhig bei der praktischen Umsetzung im Krypto-Markt. Kommt aus dem Finanzbereich und sorgt gerade bei Einsteigern für Nachvollziehbarkeit.</p>
+                        <p class="text-gold font-bold text-xl leading-tight dark:text-gold-glow">Maximilian<br>Steger</p>
+                        <p class="text-sm font-bold text-gray-600 dark:text-gray-400 mt-1 mb-3">Blockchain-Trainer</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">Begleitet Teilnehmer ruhig bei der praktischen Umsetzung im Krypto-Markt. Kommt aus dem Finanzbereich und sorgt gerade bei Einsteigern für Nachvollziehbarkeit.</p>
                     </div>
                 </div>
 
                 <!-- Team Member 4 -->
-                <div class="bg-white rounded shadow-sm overflow-hidden flex flex-col h-full">
-                    <img src="alex.webp" alt="Alexander von Berg" class="w-full h-48 object-cover object-top">
+                <div class="bg-white dark:bg-darkCard dark:border dark:border-gold/20 rounded shadow-sm overflow-hidden flex flex-col h-full hover-box-gold-glow transition-all duration-300">
+                    <img src="alex.webp" alt="Alexander von Berg" class="w-full h-48 object-cover object-top dark:opacity-90">
                     <div class="p-4 flex-grow flex flex-col">
-                        <p class="text-gold font-bold text-xl leading-tight">Alexander<br>von Berg</p>
-                        <p class="text-sm font-bold text-gray-600 mt-1 mb-3">Blockchain-Trainer (CCFE)</p>
-                        <p class="text-xs text-gray-500 leading-relaxed">Führt Teilnehmer in die Krypto-Welt. Erklärt Wallets, Börsen und Sicherheitsaspekte praxisnah und verständlich für souveränes Handeln.</p>
+                        <p class="text-gold font-bold text-xl leading-tight dark:text-gold-glow">Alexander<br>von Berg</p>
+                        <p class="text-sm font-bold text-gray-600 dark:text-gray-400 mt-1 mb-3">Blockchain-Trainer (CCFE)</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">Führt Teilnehmer in die Krypto-Welt. Erklärt Wallets, Börsen und Sicherheitsaspekte praxisnah und verständlich für souveränes Handeln.</p>
                     </div>
                 </div>
 
                 <!-- Team Member 5 -->
-                <div class="bg-white rounded shadow-sm overflow-hidden flex flex-col h-full">
-                    <img src="leonie.webp" alt="Leonie Falkner" class="w-full h-48 object-cover object-top bg-gray-200">
+                <div class="bg-white dark:bg-darkCard dark:border dark:border-gold/20 rounded shadow-sm overflow-hidden flex flex-col h-full hover-box-gold-glow transition-all duration-300">
+                    <img src="leonie.webp" alt="Leonie Falkner" class="w-full h-48 object-cover object-top bg-gray-200 dark:opacity-90">
                     <div class="p-4 flex-grow flex flex-col">
-                        <p class="text-gold font-bold text-xl leading-tight">Leonie<br>Falkner</p>
-                        <p class="text-sm font-bold text-gray-600 mt-1 mb-3">Redaktion & Wiederverwertung</p>
-                        <p class="text-xs text-gray-500 leading-relaxed">Sorgt für strukturierte Wissensvermittlung und bereitet komplexe Zusammenhänge strategisch auf.</p>
+                        <p class="text-gold font-bold text-xl leading-tight dark:text-gold-glow">Leonie<br>Falkner</p>
+                        <p class="text-sm font-bold text-gray-600 dark:text-gray-400 mt-1 mb-3">Redaktion & Wiederverwertung</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">Sorgt für strukturierte Wissensvermittlung und bereitet komplexe Zusammenhänge strategisch auf.</p>
                     </div>
                 </div>
 
                 <!-- Team Member 6 -->
-                <div class="bg-white rounded shadow-sm overflow-hidden flex flex-col h-full">
-                    <img src="anna.webp" alt="Anja Dautzenberg" class="w-full h-48 object-cover object-top">
+                <div class="bg-white dark:bg-darkCard dark:border dark:border-gold/20 rounded shadow-sm overflow-hidden flex flex-col h-full hover-box-gold-glow transition-all duration-300">
+                    <img src="anna.webp" alt="Anja Dautzenberg" class="w-full h-48 object-cover object-top dark:opacity-90">
                     <div class="p-4 flex-grow flex flex-col">
-                        <p class="text-gold font-bold text-xl leading-tight">Anja<br>Dautzenberg</p>
-                        <p class="text-sm font-bold text-gray-600 mt-1 mb-3">Persönliche Assistenz & Backoffice</p>
-                        <p class="text-xs text-gray-500 leading-relaxed">Organisatorische Schaltzentrale. Verantwortet Verträge, Onboardings und Support. Sorgt für reibungslose Abläufe.</p>
+                        <p class="text-gold font-bold text-xl leading-tight dark:text-gold-glow">Anja<br>Dautzenberg</p>
+                        <p class="text-sm font-bold text-gray-600 dark:text-gray-400 mt-1 mb-3">Persönliche Assistenz & Backoffice</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">Organisatorische Schaltzentrale. Verantwortet Verträge, Onboardings und Support. Sorgt für reibungslose Abläufe.</p>
                     </div>
                 </div>
 
                 <!-- Team Member 7 -->
-                <div class="bg-white rounded shadow-sm overflow-hidden flex flex-col h-full">
-                    <img src="jona.webp" alt="Jonathan Rosenfeld" class="w-full h-48 object-cover object-top">
+                <div class="bg-white dark:bg-darkCard dark:border dark:border-gold/20 rounded shadow-sm overflow-hidden flex flex-col h-full hover-box-gold-glow transition-all duration-300">
+                    <img src="jona.webp" alt="Jonathan Rosenfeld" class="w-full h-48 object-cover object-top dark:opacity-90">
                     <div class="p-4 flex-grow flex flex-col">
-                        <p class="text-gold font-bold text-xl leading-tight">Jonathan<br>Rosenfeld</p>
-                        <p class="text-sm font-bold text-gray-600 mt-1 mb-3">Head of Education (CCFE)</p>
-                        <p class="text-xs text-gray-500 leading-relaxed">Entwickelt Lerninhalte, analysiert den Markt und bildet Trainer aus. Begleitet Masterplan-Gold-Kunden bei komplexen Strategien.</p>
+                        <p class="text-gold font-bold text-xl leading-tight dark:text-gold-glow">Jonathan<br>Rosenfeld</p>
+                        <p class="text-sm font-bold text-gray-600 dark:text-gray-400 mt-1 mb-3">Head of Education (CCFE)</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">Entwickelt Lerninhalte, analysiert den Markt und bildet Trainer aus. Begleitet Masterplan-Gold-Kunden bei komplexen Strategien.</p>
                     </div>
                 </div>
 
                 <!-- Team Member 8 -->
-                <div class="bg-white rounded shadow-sm overflow-hidden flex flex-col h-full">
-                    <img src="kevin.webp" alt="Kevin Feist" class="w-full h-48 object-cover object-top">
+                <div class="bg-white dark:bg-darkCard dark:border dark:border-gold/20 rounded shadow-sm overflow-hidden flex flex-col h-full hover-box-gold-glow transition-all duration-300">
+                    <img src="kevin.webp" alt="Kevin Feist" class="w-full h-48 object-cover object-top dark:opacity-90">
                     <div class="p-4 flex-grow flex flex-col">
-                        <p class="text-gold font-bold text-xl leading-tight">Kevin<br>Feist</p>
-                        <p class="text-sm font-bold text-gray-600 mt-1 mb-3">Blockchain-Experte & Advisor</p>
-                        <p class="text-xs text-gray-500 leading-relaxed">Betreut gezielt High-Value-Kunden, entwickelt individuelle Lösungsansätze auf höchstem Niveau und bewertet digitale Assets.</p>
+                        <p class="text-gold font-bold text-xl leading-tight dark:text-gold-glow">Kevin<br>Feist</p>
+                        <p class="text-sm font-bold text-gray-600 dark:text-gray-400 mt-1 mb-3">Blockchain-Experte & Advisor</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">Betreut gezielt High-Value-Kunden, entwickelt individuelle Lösungsansätze auf höchstem Niveau und bewertet digitale Assets.</p>
                     </div>
                 </div>
             </div>
@@ -458,61 +584,62 @@
     </section>
 
     <!-- Media / PR / Podcast Section -->
-    <section id="pressemitteilungen" class="py-16 bg-white border-t border-gray-100">
+    <section id="pressemitteilungen" class="py-16 bg-white dark:bg-darkBg border-t border-gray-100 dark:border-gold/10 transition-colors duration-300">
         <div class="max-w-7xl mx-auto px-4 md:px-8">
-            <h2 class="text-3xl md:text-4xl font-extrabold text-center mb-6">
-                Florian Merzenich <span class="text-gold">in der Öffentlichkeit</span>
+            <h2 class="text-3xl md:text-4xl font-extrabold text-center mb-6 dark:text-white">
+                Florian Merzenich <span class="text-gold dark:text-gold-glow">in der Öffentlichkeit</span>
             </h2>
-            <p class="text-center text-lg mb-12">Fachbeiträge, Insights und der Podcast für klare Investment-Strategien.</p>
+            <p class="text-center text-lg mb-12 dark:text-gray-300">Fachbeiträge, Insights und der Podcast für klare Investment-Strategien.</p>
 
             <!-- Podcast Highlight -->
-            <div class="bg-brandBlue text-white rounded-lg p-8 mb-12 flex flex-col md:flex-row items-center justify-between shadow-xl">
-                <div>
+            <div class="bg-brandBlue dark:bg-[#111] dark:border dark:border-gold/40 text-white rounded-lg p-8 mb-12 flex flex-col md:flex-row items-center justify-between shadow-xl dark:box-gold-glow transition-colors duration-300 relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-gold/5 to-transparent pointer-events-none hidden dark:block"></div>
+                <div class="relative z-10">
                     <h3 class="text-2xl font-bold mb-2">Herausgeber und Host des einschlägigen Podcasts:</h3>
-                    <p class="text-3xl font-extrabold text-gold mb-4">"Bitte ein Podcast"</p>
-                    <p class="mb-4">Jetzt reinhören auf deiner Lieblings Podcast App:</p>
+                    <p class="text-3xl font-extrabold text-gold dark:text-gold-glow mb-4">"Bitte ein Podcast"</p>
+                    <p class="mb-4 dark:text-gray-300">Jetzt reinhören auf deiner Lieblings Podcast App:</p>
                     <div class="flex gap-4 text-2xl">
                         <i class="fab fa-apple hover:text-gold cursor-pointer transition"></i>
                         <i class="fab fa-spotify hover:text-green-400 cursor-pointer transition"></i>
                         <i class="fab fa-youtube hover:text-red-500 cursor-pointer transition"></i>
                     </div>
                 </div>
-                <div class="mt-8 md:mt-0 text-center">
-                    <i class="fas fa-microphone-alt text-6xl text-gold opacity-80"></i>
+                <div class="mt-8 md:mt-0 text-center relative z-10">
+                    <i class="fas fa-microphone-alt text-6xl text-gold opacity-80 dark:drop-shadow-[0_0_15px_rgba(177,144,67,0.8)]"></i>
                 </div>
             </div>
 
             <!-- Articles Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <!-- Article 1 -->
-                <div class="border border-gray-200 p-6 rounded shadow-sm hover:shadow-md transition">
-                    <span class="text-xs font-bold text-brandBlue uppercase tracking-wider">Fachbeitrag</span>
-                    <h4 class="text-xl font-bold mt-2 mb-3">Finanzielle Intelligenz: Die 4 goldenen Regeln für langfristigen Wohlstand</h4>
-                    <p class="text-gray-600 text-sm mb-4">Schnelles Geld ist eine Illusion. Florian Merzenich zeigt, wie du mit klaren Zielen, echtem Wissen und emotionaler Disziplin dein Vermögen strategisch aufbaust – unabhängig von Hypes und Marktgeräuschen.</p>
+                <div class="border border-gray-200 dark:border-gold/20 dark:bg-darkCard p-6 rounded shadow-sm hover:shadow-md dark:hover-box-gold-glow transition-all duration-300">
+                    <span class="text-xs font-bold text-brandBlue dark:text-gold uppercase tracking-wider">Fachbeitrag</span>
+                    <h4 class="text-xl font-bold mt-2 mb-3 dark:text-white">Finanzielle Intelligenz: Die 4 goldenen Regeln für langfristigen Wohlstand</h4>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">Schnelles Geld ist eine Illusion. Florian Merzenich zeigt, wie du mit klaren Zielen, echtem Wissen und emotionaler Disziplin dein Vermögen strategisch aufbaust – unabhängig von Hypes und Marktgeräuschen.</p>
                     <a href="#" class="text-gold font-bold hover:underline">zum Artikel <i class="fas fa-arrow-right ml-1"></i></a>
                 </div>
 
                 <!-- Article 2 -->
-                <div class="border border-gray-200 p-6 rounded shadow-sm hover:shadow-md transition">
-                    <span class="text-xs font-bold text-brandBlue uppercase tracking-wider">Fachbeitrag</span>
-                    <h4 class="text-xl font-bold mt-2 mb-3">Die 3 größten Fehler beim Vermögensaufbau – und wie du sie vermeidest</h4>
-                    <p class="text-gray-600 text-sm mb-4">Viele träumen von finanzieller Freiheit, doch die meisten scheitern nicht am Kapital, sondern an ihrer Einstellung. Erfahre, wie du die häufigsten Denkfehler überwindest.</p>
+                <div class="border border-gray-200 dark:border-gold/20 dark:bg-darkCard p-6 rounded shadow-sm hover:shadow-md dark:hover-box-gold-glow transition-all duration-300">
+                    <span class="text-xs font-bold text-brandBlue dark:text-gold uppercase tracking-wider">Fachbeitrag</span>
+                    <h4 class="text-xl font-bold mt-2 mb-3 dark:text-white">Die 3 größten Fehler beim Vermögensaufbau – und wie du sie vermeidest</h4>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">Viele träumen von finanzieller Freiheit, doch die meisten scheitern nicht am Kapital, sondern an ihrer Einstellung. Erfahre, wie du die häufigsten Denkfehler überwindest.</p>
                     <a href="#" class="text-gold font-bold hover:underline">weiterlesen <i class="fas fa-arrow-right ml-1"></i></a>
                 </div>
 
                 <!-- Article 3 -->
-                <div class="border border-gray-200 p-6 rounded shadow-sm hover:shadow-md transition">
-                    <span class="text-xs font-bold text-brandBlue uppercase tracking-wider">Fachbeitrag</span>
-                    <h4 class="text-xl font-bold mt-2 mb-3">Dein Kontostand folgt deinem Kopf – nicht dem Markt</h4>
-                    <p class="text-gray-600 text-sm mb-4">Viele glauben, Geldprobleme löst man mit mehr Geld. Florian Merzenich zeigt, warum dein Denken entscheidender ist als dein Depot – und wie du dein finanzielles Mindset neu programmierst.</p>
+                <div class="border border-gray-200 dark:border-gold/20 dark:bg-darkCard p-6 rounded shadow-sm hover:shadow-md dark:hover-box-gold-glow transition-all duration-300">
+                    <span class="text-xs font-bold text-brandBlue dark:text-gold uppercase tracking-wider">Fachbeitrag</span>
+                    <h4 class="text-xl font-bold mt-2 mb-3 dark:text-white">Dein Kontostand folgt deinem Kopf – nicht dem Markt</h4>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">Viele glauben, Geldprobleme löst man mit mehr Geld. Florian Merzenich zeigt, warum dein Denken entscheidender ist als dein Depot – und wie du dein finanzielles Mindset neu programmierst.</p>
                     <a href="#" class="text-gold font-bold hover:underline">weiterlesen <i class="fas fa-arrow-right ml-1"></i></a>
                 </div>
 
                 <!-- Article 4 -->
-                <div class="border border-gray-200 p-6 rounded shadow-sm hover:shadow-md transition">
-                    <span class="text-xs font-bold text-brandBlue uppercase tracking-wider">Fachbeitrag</span>
-                    <h4 class="text-xl font-bold mt-2 mb-3">Liquidationen am Kryptomarkt: Warum gerade jetzt große Chancen entstehen</h4>
-                    <p class="text-gray-600 text-sm mb-4">Wenn der Kryptomarkt crasht, wittern Profis keine Gefahr – sondern Chancen. Liquidationen wirken chaotisch, sind aber oft der Startpunkt für starke Kursbewegungen. Warum gerade in Panikphasen Vermögen entstehen kann.</p>
+                <div class="border border-gray-200 dark:border-gold/20 dark:bg-darkCard p-6 rounded shadow-sm hover:shadow-md dark:hover-box-gold-glow transition-all duration-300">
+                    <span class="text-xs font-bold text-brandBlue dark:text-gold uppercase tracking-wider">Fachbeitrag</span>
+                    <h4 class="text-xl font-bold mt-2 mb-3 dark:text-white">Liquidationen am Kryptomarkt: Warum gerade jetzt große Chancen entstehen</h4>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">Wenn der Kryptomarkt crasht, wittern Profis keine Gefahr – sondern Chancen. Liquidationen wirken chaotisch, sind aber oft der Startpunkt für starke Kursbewegungen. Warum gerade in Panikphasen Vermögen entstehen kann.</p>
                     <a href="#" class="text-gold font-bold hover:underline">jetzt weiterlesen <i class="fas fa-arrow-right ml-1"></i></a>
                 </div>
             </div>
@@ -520,68 +647,68 @@
     </section>
 
     <!-- FAQ Section -->
-    <section class="bg-light py-16">
+    <section class="bg-light py-16 dark:bg-transparent border-t dark:border-gold/10">
         <div class="max-w-4xl mx-auto px-4">
-            <h2 class="text-3xl font-extrabold text-center mb-4">FAQ</h2>
-            <p class="text-center text-gray-600 mb-10">Viele Interessenten suchen Antworten, hier findest du die Antworten auf die häufig gestellten Fragen:</p>
+            <h2 class="text-3xl font-extrabold text-center mb-4 dark:text-white">FAQ</h2>
+            <p class="text-center text-gray-600 dark:text-gray-400 mb-10">Viele Interessenten suchen Antworten, hier findest du die Antworten auf die häufig gestellten Fragen:</p>
             
             <div class="space-y-4">
-                <details class="group bg-white rounded shadow-sm border border-gray-200">
-                    <summary class="flex justify-between items-center font-bold cursor-pointer list-none p-5">
+                <details class="group bg-white dark:bg-darkCard rounded shadow-sm border border-gray-200 dark:border-gold/30 transition-colors duration-300">
+                    <summary class="flex justify-between items-center font-bold cursor-pointer list-none p-5 dark:text-white hover:text-gold dark:hover:text-gold transition">
                         <span>Was kostet das Mentoring?</span>
                         <span class="transition group-open:rotate-180">
                             <i class="fas fa-chevron-down text-gold"></i>
                         </span>
                     </summary>
-                    <div class="text-gray-600 p-5 pt-0 border-t border-gray-100">
+                    <div class="text-gray-600 dark:text-gray-400 p-5 pt-0 border-t border-gray-100 dark:border-gold/20">
                         Das Investment für unser Mentoring ist individuell und richtet sich nach deinen konkreten Zielen und deinem Ausgangspunkt. Genaueres besprechen wir im persönlichen Erstgespräch, um dir eine maßgeschneiderte Lösung anzubieten.
                     </div>
                 </details>
 
-                <details class="group bg-white rounded shadow-sm border border-gray-200">
-                    <summary class="flex justify-between items-center font-bold cursor-pointer list-none p-5">
+                <details class="group bg-white dark:bg-darkCard rounded shadow-sm border border-gray-200 dark:border-gold/30 transition-colors duration-300">
+                    <summary class="flex justify-between items-center font-bold cursor-pointer list-none p-5 dark:text-white hover:text-gold dark:hover:text-gold transition">
                         <span>Brauche ich Vorkenntnisse in Krypto?</span>
                         <span class="transition group-open:rotate-180">
                             <i class="fas fa-chevron-down text-gold"></i>
                         </span>
                     </summary>
-                    <div class="text-gray-600 p-5 pt-0 border-t border-gray-100">
+                    <div class="text-gray-600 dark:text-gray-400 p-5 pt-0 border-t border-gray-100 dark:border-gold/20">
                         Nein, du benötigst absolut keine Vorkenntnisse. Wir holen dich genau dort ab, wo du stehst, und führen dich Schritt für Schritt an alle relevanten Themen heran – von den Grundlagen bis zur fortgeschrittenen Strategie.
                     </div>
                 </details>
 
-                <details class="group bg-white rounded shadow-sm border border-gray-200">
-                    <summary class="flex justify-between items-center font-bold cursor-pointer list-none p-5">
+                <details class="group bg-white dark:bg-darkCard rounded shadow-sm border border-gray-200 dark:border-gold/30 transition-colors duration-300">
+                    <summary class="flex justify-between items-center font-bold cursor-pointer list-none p-5 dark:text-white hover:text-gold dark:hover:text-gold transition">
                         <span>Wie sicher ist das Ganze?</span>
                         <span class="transition group-open:rotate-180">
                             <i class="fas fa-chevron-down text-gold"></i>
                         </span>
                     </summary>
-                    <div class="text-gray-600 p-5 pt-0 border-t border-gray-100">
+                    <div class="text-gray-600 dark:text-gray-400 p-5 pt-0 border-t border-gray-100 dark:border-gold/20">
                         Wir vermitteln Strategien, die auf Sicherheit, Risikominimierung und Eigenkontrolle basieren. Du hast jederzeit die 100%ige Kontrolle über deine Assets. Sicherheit steht in unserer Ausbildung an erster Stelle.
                     </div>
                 </details>
 
-                <details class="group bg-white rounded shadow-sm border border-gray-200">
-                    <summary class="flex justify-between items-center font-bold cursor-pointer list-none p-5">
+                <details class="group bg-white dark:bg-darkCard rounded shadow-sm border border-gray-200 dark:border-gold/30 transition-colors duration-300">
+                    <summary class="flex justify-between items-center font-bold cursor-pointer list-none p-5 dark:text-white hover:text-gold dark:hover:text-gold transition">
                         <span>Wie viel Zeit muss ich einplanen?</span>
                         <span class="transition group-open:rotate-180">
                             <i class="fas fa-chevron-down text-gold"></i>
                         </span>
                     </summary>
-                    <div class="text-gray-600 p-5 pt-0 border-t border-gray-100">
+                    <div class="text-gray-600 dark:text-gray-400 p-5 pt-0 border-t border-gray-100 dark:border-gold/20">
                         Unser Programm ist speziell für vielbeschäftigte Unternehmer und Führungskräfte konzipiert. Mit einem Zeitaufwand von wenigen Stunden pro Woche kommst du optimal durch die Inhalte und in die Umsetzung.
                     </div>
                 </details>
 
-                <details class="group bg-white rounded shadow-sm border border-gray-200">
-                    <summary class="flex justify-between items-center font-bold cursor-pointer list-none p-5">
+                <details class="group bg-white dark:bg-darkCard rounded shadow-sm border border-gray-200 dark:border-gold/30 transition-colors duration-300">
+                    <summary class="flex justify-between items-center font-bold cursor-pointer list-none p-5 dark:text-white hover:text-gold dark:hover:text-gold transition">
                         <span>Wann sehe ich erste Ergebnisse?</span>
                         <span class="transition group-open:rotate-180">
                             <i class="fas fa-chevron-down text-gold"></i>
                         </span>
                     </summary>
-                    <div class="text-gray-600 p-5 pt-0 border-t border-gray-100">
+                    <div class="text-gray-600 dark:text-gray-400 p-5 pt-0 border-t border-gray-100 dark:border-gold/20">
                         Klarheit und strategisches Verständnis erlangst du bereits in den ersten Wochen. Die finanziellen Ergebnisse stellen sich als Resultat der konsequenten Umsetzung unserer mittel- und langfristigen Strategien ein.
                     </div>
                 </details>
@@ -590,12 +717,13 @@
     </section>
 
     <!-- Call to Action Footer -->
-    <section class="py-16 text-white" style="background-image: url('https://static.funnelcockpit.com/upload/JEs4ECXwpsn6og42C/47e8a8b1cd15c66ae12ab399fe174ceb.webp'); background-size: cover; background-position: center;">
-        <div class="max-w-7xl mx-auto px-4 md:px-8">
+    <section class="py-16 text-white relative overflow-hidden" style="background-image: url('https://static.funnelcockpit.com/upload/JEs4ECXwpsn6og42C/47e8a8b1cd15c66ae12ab399fe174ceb.webp'); background-size: cover; background-position: center;">
+        <div class="absolute inset-0 bg-black/60 dark:bg-black/80"></div>
+        <div class="max-w-7xl mx-auto px-4 md:px-8 relative z-10">
             <div class="max-w-2xl">
-                <h2 class="text-3xl md:text-4xl font-bold mb-6">Starte jetzt mit deiner persönlichen Investmentstrategie und werde zum souveränen Finanzentscheider.</h2>
-                <p class="text-lg mb-8">Wenn du bereit bist, Verantwortung zu übernehmen, beginnt hier dein nächster Schritt: Keine Produkte. Keine Theorie. Sondern ein mentorgeführtes System, mit dem du verstehst, entscheidest und dein Kapital gezielt steuerst.</p>
-                <a href="#mentoring" class="bg-brandBlue hover:bg-opacity-90 text-white font-bold text-lg py-4 px-10 rounded-full shadow-lg transition inline-block">
+                <h2 class="text-3xl md:text-4xl font-bold mb-6 dark:text-gold-glow">Starte jetzt mit deiner persönlichen Investmentstrategie und werde zum souveränen Finanzentscheider.</h2>
+                <p class="text-lg mb-8 dark:text-gray-300">Wenn du bereit bist, Verantwortung zu übernehmen, beginnt hier dein nächster Schritt: Keine Produkte. Keine Theorie. Sondern ein mentorgeführtes System, mit dem du verstehst, entscheidest und dein Kapital gezielt steuerst.</p>
+                <a href="https://flos-funnel.pages.dev" target="_blank" class="bg-brandBlue hover:bg-opacity-90 text-white font-bold text-lg py-4 px-10 rounded-full shadow-lg transition inline-block dark:gold-gradient-anim">
                     Kostenloses Erstgespräch vereinbaren
                 </a>
             </div>
@@ -603,11 +731,11 @@
     </section>
 
     <!-- Footer -->
-    <footer class="bg-black text-white py-12">
+    <footer class="bg-black text-white py-12 dark:border-t dark:border-gold/20">
         <div class="max-w-7xl mx-auto px-4 md:px-8">
             <div class="text-center mb-8">
-                <a href="#" class="text-white hover:text-gold mx-2">Datenschutz</a> - 
-                <a href="#" class="text-white hover:text-gold mx-2">Impressum</a>
+                <a href="#" class="text-white hover:text-gold mx-2 transition">Datenschutz</a> - 
+                <a href="#" class="text-white hover:text-gold mx-2 transition">Impressum</a>
             </div>
             <div class="text-center text-xs text-gray-400 space-y-2">
                 <p>¹ Interne Portfoliobewertungen von Florian Merzenich, 5.000+ Klienten, Zeitraum 2018-2024. Ergebnisse der Vergangenheit sind keine Garantie für zukünftige Entwicklungen.</p>
@@ -617,14 +745,33 @@
         </div>
     </footer>
 
-    <!-- Mobile Menu Script -->
+    <!-- Scripts -->
     <script>
+        // Mobile Menu Toggle
         const btn = document.getElementById('mobile-menu-btn');
         const menu = document.getElementById('mobile-menu');
 
         btn.addEventListener('click', () => {
             menu.classList.toggle('hidden');
         });
+
+        // Dark Mode Toggle Logic
+        const themeToggleDesktop = document.getElementById('theme-toggle-desktop');
+        const themeToggleMobile = document.getElementById('theme-toggle-mobile');
+
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+            
+            // Save preference
+            if (document.documentElement.classList.contains('dark')) {
+                localStorage.setItem('theme', 'dark');
+            } else {
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        themeToggleDesktop.addEventListener('click', toggleTheme);
+        themeToggleMobile.addEventListener('click', toggleTheme);
     </script>
 </body>
 </html>
